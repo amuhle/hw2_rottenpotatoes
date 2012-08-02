@@ -1,17 +1,17 @@
 -#  This file is app/views/movies/index.html.haml
 %h1 All Movies
-
+= render 'filter'
 %table#movies
   %thead
     %tr
-      %th Movie Title
-      %th Rating
-      %th Release Date
+      %th{ :class => ("hilite" if @hilite_column == "title") }= sortable("title", "Movie Title", "title_header")
+      %th= 'Rating'
+      %th{ :class => ("hilite" if @hilite_column == "release_date") }= sortable("release_date", "Release date", "release_date_header")
       %th More Info
   %tbody
     - @movies.each do |movie|
       %tr
-        %td= movie.title 
+        %td= movie.title
         %td= movie.rating
         %td= movie.release_date
         %td= link_to "More about #{movie.title}", movie_path(movie)
