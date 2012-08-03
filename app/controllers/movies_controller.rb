@@ -8,7 +8,6 @@ class MoviesController < ApplicationController
   end
 
   def index
-    puts params[:ratings].count.to_s
     @hilite_column = sort_column
     @movies = Movie.order(sort_column + " " + sort_direction)
     @all_ratings = %w[G PG PG-13 R]
