@@ -62,6 +62,7 @@ class MoviesController < ApplicationController
   end
 
   def save_params(params)
+    session[:ratings] ||= []
     session[:ratings] = ratings_to_array unless params[:ratings].nil?
     session[:sort] ||= "title"
     session[:sort] = params[:sort] if Movie.column_names.include?(params[:sort])
