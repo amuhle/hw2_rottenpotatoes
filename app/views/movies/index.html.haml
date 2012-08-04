@@ -1,5 +1,6 @@
 -#  This file is app/views/movies/index.html.haml
 %h1 All Movies
+%p= flash[:info]
 = render 'filter'
 %table#movies
   %thead

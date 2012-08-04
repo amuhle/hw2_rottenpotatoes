@@ -9,11 +9,7 @@ class Movie < ActiveRecord::Base
   end
 
   def self.with_ratings(ratings)
-    if ratings.empty?
-      Movie
-    else
       Movie.where(:rating => ratings)
-    end
   end
 
 end
