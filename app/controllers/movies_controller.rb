@@ -1,5 +1,5 @@
 class MoviesController < ApplicationController
-  helper_method :sort_column, :sort_direction, :selected_ratings
+  helper_method :sort_column, :selected_ratings
 
   def show
     id = params[:id] # retrieve movie ID from URI route
@@ -8,14 +8,14 @@ class MoviesController < ApplicationController
   end
 
   def index
-    unless validate_params
+    if !valid_params || (params[:sort].nil? && params[:ratings].nil?)
       flash.keep
-      redirect_to movies_path(ratings: selected_ratings, sort: sort_column, direction: sort_direction)
+      redirect_to movies_path(ratings: selected_ratings, sort: sort_column)
     end
     save_params(params)
     @hilite_column = session[:sort]
     @ratings_keys = session[:ratings]
-    @movies = Movie.with_ratings(@ratings_keys).order(session[:sort] + " " + session[:direction])
+    @movies = Movie.with_ratings(@ratings_keys).order(session[:sort])
     @all_ratings = Movie.ratings
   end
 
@@ -50,15 +50,11 @@ class MoviesController < ApplicationController
   private
   
   def sort_column
-    session[:sort]
+    session[:sort].nil? ? "title" : session[:sort]
   end
   
-  def sort_direction
-    session[:direction]
-  end
-
   def selected_ratings
-    session[:ratings]
+    session[:ratings].nil? ? [] : session[:ratings]
   end
 
   def save_params(params)
@@ -66,19 +62,13 @@ class MoviesController < ApplicationController
     session[:ratings] = ratings_to_array unless params[:ratings].nil?
     session[:sort] ||= "title"
     session[:sort] = params[:sort] if Movie.column_names.include?(params[:sort])
-    session[:direction] ||= "asc"
-    session[:direction] = params[:direction] if %w[asc desc].include?(params[:direction])
   end
 
-  def validate_params
+  def valid_params
     valid = true
     unless params[:sort].nil? || Movie.column_names.include?(params[:sort])
       valid = false
       flash[:info] = "Sort column not found."
-    end
-    unless params[:direction].nil? || %w[asc desc].include?(params[:direction])
-      valid = false
-      flash[:info] = "Incorrect sort direction value"
     end
     ratings_to_array.each do |r|
       unless Movie.ratings.include?(r)
